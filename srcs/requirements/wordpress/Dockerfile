@@ -13,14 +13,16 @@ RUN apt-get update && apt-get install -y \
     && apt-get clean 
 
 # Copy entrypoint script and make it executable
-COPY init.sh /usr/local/bin/init.sh
+COPY tools/init.sh /usr/local/bin/init.sh
 
 RUN chmod +x /usr/local/bin/init.sh
 
-COPY www.conf /etc/php/7.4/fpm/pool.d/www.conf
+COPY conf/www.conf /etc/php/7.4/fpm/pool.d/www.conf
 
 # Set entrypoint
-CMD ["/usr/local/bin/init.sh"]
+ENTRYPOINT ["/usr/local/bin/init.sh"]
+
+CMD ["/usr/sbin/php-fpm7.4", "-F"]
 
 ## Start PHP-FPM
 

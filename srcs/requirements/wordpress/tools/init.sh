@@ -47,7 +47,7 @@ if [ ! -e /var/www/html/$DOMAIN_NAME/.wordpress_setup_done ]; then
     	echo "Creating additional user..."
     	wp user create "$WORDPRESS_DB_USER" "$WORDPRESS_DB_EMAIL" \
 			--path=/var/www/html/$DOMAIN_NAME \
-    	    --role=editor \
+    	    --role=author \
     	    --user_pass="$WORDPRESS_DB_PASSWORD" \
 		    --allow-root
     fi
@@ -59,4 +59,4 @@ fi
 
 
 # Start PHP-FPM
-exec /usr/sbin/php-fpm7.4 -F
+exec "$@"

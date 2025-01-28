@@ -3,13 +3,13 @@ COMPOSE= -f srcs/docker-compose.yml
 all: build
 
 run:
-	@mkdir -p ./wp_vol
-	@mkdir -p ./db_vol
+	@mkdir -p /home/pskrucha/data/wp_vol
+	@mkdir -p /home/pskrucha/data/db_vol
 	@docker compose ${COMPOSE} up -d
 
 build:
-	@mkdir -p ./wp_vol
-	@mkdir -p ./db_vol
+	@mkdir -p /home/pskrucha/data/wp_vol
+	@mkdir -p /home/pskrucha/data/db_vol
 	@docker compose ${COMPOSE} build --no-cache --pull
 
 build_run: build run
@@ -21,10 +21,9 @@ clean:
 	@docker compose ${COMPOSE} down --volumes --rmi all --remove-orphans
 
 fclean: clean
-	@docker system  ${COMPOSE}prune --all
-	@docker builder ${COMPOSE} prune --all
-	@sudo rm -rf db_vol
-	@sudo rm -rf wp_vol
+	@docker system prune --all
+	@docker builder prune --all
+	@sudo rm -rf /home/pskrucha/data
 
 re: fclean run
 
