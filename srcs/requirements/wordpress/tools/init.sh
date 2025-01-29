@@ -23,8 +23,6 @@ if [ ! -e /var/www/html/$DOMAIN_NAME/.wordpress_setup_done ]; then
     	echo "Downloading WordPress..."
     	wp core download --allow-root
 
-# Check if WordPress is already installed
-	#wp core is-installed --path=/var/www/html --allow-root; then
     	echo "Creating wp-config.php..."
     	wp config create \
 			--path=/var/www/html/$DOMAIN_NAME \
@@ -50,6 +48,20 @@ if [ ! -e /var/www/html/$DOMAIN_NAME/.wordpress_setup_done ]; then
     	    --role=author \
     	    --user_pass="$WORDPRESS_DB_PASSWORD" \
 		    --allow-root
+		
+		until nc -z redis 6379; do echo 'Waiting for Redis...' && sleep 5; done
+
+		echo "Installing & Activating Redis Cache Plugin..."
+        wp plugin install redis-cache --activate --allow-root
+		
+        echo "Setting Redis Cache Config in wp-config.php..."
+        wp config set WP_REDIS_HOST "redis" --allow-root
+        wp config set WP_REDIS_PORT "6379" --raw --allow-root
+        wp config set WP_CACHE true --raw --allow-root
+		wp config set WP_CACHE true --raw --allow-root --path=/var/www/html/$DOMAIN_NAME
+
+        echo "Enabling Redis Cache..."
+        wp redis enable --allow-root --path=/var/www/html/$DOMAIN_NAME
     fi
 
     touch /var/www/html/$DOMAIN_NAME/.wordpress_setup_done
