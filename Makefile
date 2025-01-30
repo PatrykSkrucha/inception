@@ -1,6 +1,6 @@
 COMPOSE= -f srcs/docker-compose.yml
 
-all: build
+all: build run
 
 run:
 	@mkdir -p /home/${USER}/data/wp_vol
@@ -11,8 +11,6 @@ build:
 	@mkdir -p /home/${USER}/data/wp_vol
 	@mkdir -p /home/${USER}/data/db_vol
 	@docker compose ${COMPOSE} build --no-cache --pull
-
-build_run: build run
 
 down:
 	@docker compose ${COMPOSE} down

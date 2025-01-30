@@ -13,7 +13,7 @@ services:
     env_file:
       - .env
     volumes:
-      - /home/${USER}/data/wp_vol:/var/www/html
+      - wp_vol:/var/www/html
       - adminer_vol:/var/www/html/adminer
     depends_on:
       - wordpress
@@ -30,7 +30,7 @@ services:
     env_file:
       - .env
     volumes:
-      - /home/${USER}/data/wp_vol:/var/www/html
+      - wp_vol:/var/www/html
       - adminer_vol:/var/www/html/adminer
     expose:
       - 9000
@@ -51,7 +51,7 @@ services:
     env_file:
       - .env
     volumes:
-      - /home/${USER}/data/db_vol:/var/lib/mysql
+      - db_vol:/var/lib/mysql
     expose:
       - 3306
     networks:
@@ -74,7 +74,7 @@ services:
       context: requirements/adminer
       dockerfile: Dockerfile
     expose:
-      - 9000
+      - 9001
     restart: always
     networks:
       - inception
@@ -83,8 +83,28 @@ services:
     volumes:
       - adminer_vol:/var/www/html/adminer
 
+  ftp:
+    container_name: ftp
+    build:
+      context: requirements/ftp
+      dockerfile: Dockerfile
+      args:
+        WORDPRESS_DB_PASSWORD: ${WORDPRESS_DB_PASSWORD}
+    ports:
+      - "21:21"
+      - "30000-30009:30000-30009"
+    networks:
+      - inception
+    env_file:
+      - .env
+    volumes:
+      - wp_vol:/home/ftpuser/wordpress
+    depends_on:
+      - wordpress
+
 networks:
   inception:
+    name: inception
     driver: bridge
 
 volumes:
@@ -93,11 +113,16 @@ volumes:
     driver_opts:
       o: bind
       type: none
-      device: ${HOME}/data/adminer_vol
-
-  #wordpress_vol:
-  #  driver: local
-  #  driver_opts:
-  #    o: bind
-  #    type: none
-  #    device: ${HOME}/data/wp
+      device: /home/${USER}/data/adminer_vol
+  wp_vol:
+    driver: local
+    driver_opts:
+      o: bind
+      type: none
+      device: /home/${USER}/data/wp_vol
+  db_vol:
+    driver: local
+    driver_opts:
+      o: bind
+      type: none
+      device: /home/${USER}/data/db_vol
